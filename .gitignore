@@ -1,0 +1,45 @@
+# Build directories
+build/
+bin/
+
+# Object files
+*.o
+*.obj
+
+# Executables
+*.out
+*.exe
+*.app
+
+# Static / dynamic libraries
+*.a
+*.so
+*.dll
+*.dylib
+
+# Dependency files
+*.d
+*.dep
+
+# Debug / profiling
+*.log
+*.prof
+*.gmon
+
+# Core dumps
+core
+core.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Neovim / Vim undo + swap
+*.un~
