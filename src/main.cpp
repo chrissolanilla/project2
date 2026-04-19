@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <fstream>
 
 int main(int argc, char *argv[]) {
 	// std::cout << "hello" << "\n";
@@ -14,9 +16,9 @@ int main(int argc, char *argv[]) {
 
 	if(argc < 2) {
 		std::cout << "Please provide arugments" << "\n";
-		std::cout << "To run Bimodal: ./sim bimodal <M2> <tracefile>    (M2 = PC bits)" << "\n";
+		std::cout << "To run bimodal: ./sim bimodal <M2> <tracefile>    (M2 = PC bits)" << "\n";
 		std::cout << "To run gshare: ./sim gshare <M1> <N> <tracefile>    (M1 = PC bits, N = global branch history register bits)" << "\n";
-        std::cout << "To run hybrid: ./sim hybrid <K> <M1> <N> <M2>    (K= number of PC bits used to index the chooser table, M1 = number PC bits, N global history register bits, M2 = number PC bits for bimdal table)" << "\n";
+        std::cout << "To run hybrid: ./sim hybrid <K> <M1> <N> <M2> <tracefile>   (K= number of PC bits used to index the chooser table, M1 = number PC bits, N global history register bits, M2 = number PC bits for bimdal table)" << "\n";
 	}
 
 	if(argc >= 2) {
@@ -32,7 +34,7 @@ int main(int argc, char *argv[]) {
             hybrid = true;
         }
         if(!bimodal && !gshare && !hybrid) {
-            std::cout << "Error: please provide either bimodal or gshare as the first argument" << "\n";
+            std::cout << "Error: please provide either bimodal, hybrid, or gshare as the first argument" << "\n";
             std::cout << "Your argument was: " << arg << "\n";
             return 1;
         }
@@ -72,7 +74,7 @@ int main(int argc, char *argv[]) {
         else if(hybrid) {
             if (argc != 6) {
                 std::cout << "ERROR: hybrid requires 5 arguments" << "\n";
-                std::cout << "To run hybrid: ./sim hybrid <K> <M1> <N> <M2>    (K= number of PC bits used to index the chooser table, M1 = number PC bits, N global history register bits, M2 = number PC bits for bimdal table)" << "\n";
+                std::cout << "To run hybrid: ./sim hybrid <K> <M1> <N> <M2> <tracefile>   (K= number of PC bits used to index the chooser table, M1 = number PC bits, N global history register bits, M2 = number PC bits for bimdal table)" << "\n";
                 return 1;
             }
             for(int i=0;i<4;i++) {
@@ -87,7 +89,27 @@ int main(int argc, char *argv[]) {
             std::cout << "registerBits is " << registerBits << "\n";
             numBimodalPCBits = atoi(argv[5]);
             std::cout << "numBimodalPCBits is " << numBimodalPCBits << "\n";
+            traceFile = argv[6];
+            std::cout << "traceFile is " << traceFile << "\n";
         }
+
+        if(traceFile == "") {
+            std::cout << "ERROR: tracefile argument is missing" << "\n";
+            std::cout << "tracefile: " << traceFile << "\n";
+            return 1;
+        }
+        std::ifstream file(traceFile);
+        std::string line;
+        if(file.is_open()) {
+            while(std::getline(file, line)) {
+                std::cout << line << "\n";
+            }
+            file.close();
+        }
+        else  {
+            std::cerr << "Unable to open file";
+        }
+
 	}
 	return 0;
 }
