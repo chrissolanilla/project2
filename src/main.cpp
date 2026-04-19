@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
             std::cout << "traceFile is " << traceFile << "\n";
         }
         else if(hybrid) {
-            if (argc != 6) {
+            if (argc != 7) {
                 std::cout << "ERROR: hybrid requires 5 arguments" << "\n";
                 std::cout << "To run hybrid: ./sim hybrid <K> <M1> <N> <M2> <tracefile>   (K= number of PC bits used to index the chooser table, M1 = number PC bits, N global history register bits, M2 = number PC bits for bimdal table)" << "\n";
                 return 1;
