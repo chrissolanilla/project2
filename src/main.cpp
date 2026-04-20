@@ -5,6 +5,7 @@
 
 #include "BimodalPredictor.h"
 #include "GsharePredictor.h"
+#include "HybridPredictor.h"
 
 int main(int argc, char *argv[]) {
 	// std::cout << "hello" << "\n";
@@ -102,6 +103,7 @@ int main(int argc, char *argv[]) {
         std::cout << "tracefile: " << traceFile << "\n";
         return 1;
     }
+
     //run bimodal
     if (bimodal) {
         BimodalPredictor predictor(numPCBits);
@@ -129,41 +131,58 @@ int main(int argc, char *argv[]) {
         predictor.printFinalContents(std::cout);
     }
 
-    if(gshare) {
+    //run gshare
+    else if(gshare) {
         GsharePredictor predictor(numPCBits, registerBits);
         std::ifstream file(traceFile);
-    if (!file.is_open()) {
-        std::cerr << "Unable to open file: " << traceFile << "\n";
-        return 1;
+        if (!file.is_open()) {
+            std::cerr << "Unable to open file: " << traceFile << "\n";
+            return 1;
+        }
+
+        std::string pcString;
+        char outcome;
+
+        while (file >> pcString >> outcome) {
+            uint32_t pc = static_cast<uint32_t>(std::stoul(pcString, nullptr, 16));
+            bool taken = (outcome == 't');
+            predictor.processBranch(pc, taken);
+        }
+
+        std::cout << "OUTPUT\n";
+        std::cout << "number of predictions:\t\t" << predictor.getNumPredictions() << "\n";
+        std::cout << "number of mispredictions:\t" << predictor.getNumMispredictions() << "\n";
+        std::cout << std::fixed << std::setprecision(2);
+        std::cout << "misprediction rate:\t\t" << predictor.getMispredictionRate() << "%\n";
+        predictor.printFinalContents(std::cout);
     }
 
-    std::string pcString;
-    char outcome;
+    //run hybrid
+    else if (hybrid) {
+        HybridPredictor predictor(chooserTableK, numPCBits, registerBits, numBimodalPCBits);
 
-    while (file >> pcString >> outcome) {
-        uint32_t pc = static_cast<uint32_t>(std::stoul(pcString, nullptr, 16));
-        bool taken = (outcome == 't');
-        predictor.processBranch(pc, taken);
-    }
+        std::ifstream file(traceFile);
+        if (!file.is_open()) {
+            std::cerr << "Unable to open file: " << traceFile << "\n";
+            return 1;
+        }
 
-    std::cout << "OUTPUT\n";
-    std::cout << "number of predictions:\t\t" << predictor.getNumPredictions() << "\n";
-    std::cout << "number of mispredictions:\t" << predictor.getNumMispredictions() << "\n";
-    std::cout << std::fixed << std::setprecision(2);
-    std::cout << "misprediction rate:\t\t" << predictor.getMispredictionRate() << "%\n";
-    predictor.printFinalContents(std::cout);
+        std::string pcString;
+        char outcome;
+
+        while (file >> pcString >> outcome) {
+            uint32_t pc = static_cast<uint32_t>(std::stoul(pcString, nullptr, 16));
+            bool taken = (outcome == 't');
+            predictor.processBranch(pc, taken);
+        }
+
+        std::cout << "OUTPUT\n";
+        std::cout << "number of predictions:\t\t" << predictor.getNumPredictions() << "\n";
+        std::cout << "number of mispredictions:\t" << predictor.getNumMispredictions() << "\n";
+        std::cout << std::fixed << std::setprecision(2);
+        std::cout << "misprediction rate:\t\t" << predictor.getMispredictionRate() << "%\n";
+        predictor.printFinalContents(std::cout);
     }
-    // std::ifstream file(traceFile);
-    // std::string line;
-    // if(file.is_open()) {
-    //     while(std::getline(file, line)) {
-    //         std::cout << line << "\n";
-    //     }
-    //     file.close();
-    // }
-    // else  {
-    //     std::cerr << "Unable to open file";
-    // }
 
 	return 0;
 }

@@ -31,6 +31,7 @@ public:
         return table[index] >= 4;
     }
 
+
     void update(unsigned int index, bool actualTaken) {
         if(actualTaken) {
             if (table[index] < 7) {
@@ -42,6 +43,11 @@ public:
                 table[index]--;
             }
         }
+    }
+
+    void updateCounterOnly(uint32_t pc, bool actualTaken) {
+        unsigned int index = getIndex(pc);
+        update(index, actualTaken);
     }
 
     void processBranch(uint32_t pc, bool actualTaken) {
@@ -73,11 +79,16 @@ public:
                      / static_cast<double>(numPredictions);
     }
 
-    void printFinalContents(std::ostream& out) const {
-        out << "FINAL BIMODAL CONTENTS\n";
+    //need this for using it in HybridPredictor
+    void printFinalContentsWithoutHeader(std::ostream& out) const {
         for (size_t i = 0; i < table.size(); i++) {
             out << i << "\t" << table[i] << "\n";
         }
+    }
+
+    void printFinalContents(std::ostream& out) const {
+        out << "FINAL BIMODAL CONTENTS\n";
+        printFinalContentsWithoutHeader(out);
     }
 };
 

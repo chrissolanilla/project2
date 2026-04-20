@@ -38,7 +38,7 @@ public:
         unsigned int upperPCBits = pcIndex & ~lowerNMask;
 
         unsigned int xoredLowerBits = lowerPCBits ^ globalHistory;
-
+        //final index i just top + the new bottom
         return upperPCBits | xoredLowerBits;
     }
 
@@ -59,6 +59,11 @@ public:
         }
     }
 
+    void updateCounterOnly(uint32_t pc, bool actualTaken) {
+        unsigned int index = getIndex(pc);
+        updateCounter(index, actualTaken);
+    }
+
     void updateGlobalHistory(bool actualTaken) {
         if (n == 0) {
             return;
@@ -71,6 +76,10 @@ public:
         }
 
         globalHistory &= (1u << n) - 1u;
+    }
+
+    void updateHistoryOnly(bool actualTaken) {
+        updateGlobalHistory(actualTaken);
     }
 
     void processBranch(uint32_t pc, bool actualTaken) {
@@ -104,11 +113,15 @@ public:
                      / static_cast<double>(numPredictions);
     }
 
-    void printFinalContents(std::ostream& out) const {
-        out << "FINAL GSHARE CONTENTS\n";
+    void printFinalContentsWithoutHeader(std::ostream& out) const {
         for (size_t i = 0; i < table.size(); i++) {
             out << i << "\t" << table[i] << "\n";
         }
+    }
+
+    void printFinalContents(std::ostream& out) const {
+        out << "FINAL GSHARE CONTENTS\n";
+        printFinalContentsWithoutHeader(out);
     }
 };
 
